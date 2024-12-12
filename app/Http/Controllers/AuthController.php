@@ -26,11 +26,25 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        // Add debugging
+        \Log::info('Login attempt', [
+            'email' => $credentials['email'],
+            // Don't log passwords!
+        ]);
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            \Log::info('Login successful', [
+                'email' => $credentials['email']
+            ]);
+
             return redirect()->intended('dashboard');
         }
+
+        \Log::warning('Login failed', [
+            'email' => $credentials['email']
+        ]);
 
         throw ValidationException::withMessages([
             'email' => __('auth.failed'),

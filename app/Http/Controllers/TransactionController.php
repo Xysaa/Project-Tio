@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\Item;
 
 class TransactionController extends Controller
 {
@@ -67,9 +68,11 @@ class TransactionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $transaction = Transaction::findOrFail($id);
+        $items = Item::all();
+        return view('transactions.edit', compact('transaction','items'));
     }
 
     /**
@@ -77,14 +80,17 @@ class TransactionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Transaction $transaction)
     {
-        //
+        $transaction->delete();
+
+        return redirect()->route('transactions.index')
+            ->with('success', 'Transactions deleted successfully.');
     }
 }
