@@ -1,37 +1,56 @@
-<x-app-layout>
-    <div class="max-w-7xl mx-auto py-10">
-        <h1 class="text-2xl font-bold mb-6">Transactions</h1>
-        <a href="{{ route('transactions.create') }}" class="px-4 py-2 bg-blue-500 text-white mb-4 inline-block">Add Transaction</a>
-        <table class="table-auto w-full border-collapse border border-gray-300">
+@extends('layouts.app')
+
+@section('content')
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Transactions</h2>
+
+    <a href="{{ route('transactions.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4 inline-block">
+        Add New Transaction
+    </a>
+
+    @if($transactions->count() > 0)
+        <table class="w-full bg-white">
             <thead>
-                <tr>
-                    <th class="border border-gray-300 px-4 py-2">#</th>
-                    <th class="border border-gray-300 px-4 py-2">Item</th>
-                    <th class="border border-gray-300 px-4 py-2">Type</th>
-                    <th class="border border-gray-300 px-4 py-2">Quantity</th>
-                    <th class="border border-gray-300 px-4 py-2">Date</th>
+                <tr class="bg-gray-200">
+                    <th class="p-3 text-left">#</th>
+                    <th class="p-3 text-left">Item</th>
+                    <th class="p-3 text-left">Type</th>
+                    <th class="p-3 text-left">Quantity</th>
+                    <th class="p-3 text-left">Date</th>
+                    <th class="p-3 text-left">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($transactions as $transaction)
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2">{{ $loop->iteration }}</td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $transaction->item->name }}</td>
-                        <td class="border border-gray-300 px-4 py-2">
+                    <tr class="border-b">
+                        <td class="p-3">{{ $loop->iteration }}</td>
+                        <td class="p-3">{{ $transaction->item->name }}</td>
+                        <td class="p-3">
                             <span class="px-2 py-1 text-white rounded
                                 {{ $transaction->type === 'in' ? 'bg-green-500' : 'bg-red-500' }}">
                                 {{ ucfirst($transaction->type) }}
                             </span>
                         </td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $transaction->quantity }}</td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $transaction->created_at->format('d-m-Y H:i') }}</td>
+                        <td class="p-3">{{ $transaction->quantity }}</td>
+                        <td class="p-3">{{ $transaction->created_at->format('d-m-Y H:i') }}</td>
+                        <td class="p-3">
+                            <a href="{{ route('transactions.edit', $transaction) }}" class="text-blue-500 mr-2">Edit</a>
+                            <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
         <div class="mt-4">
             {{ $transactions->links() }}
         </div>
-        
-    </div>
-</x-app-layout>
+    @else
+        <p class="text-gray-600">No transactions found.</p>
+    @endif
+</div>
+@endsection
